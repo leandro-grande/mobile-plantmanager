@@ -1,20 +1,57 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import 'react-native-gesture-handler';
+import { useEffect } from "react";
+import * as SplashScreen from 'expo-splash-screen';
+import { Jost_300Light, Jost_400Regular, Jost_600SemiBold, useFonts  } from "@expo-google-fonts/jost";
+import { ThemeProvider } from "styled-components/native";
+import * as Notifications from "expo-notifications";
 
-export default function App() {
+import theme from "./src/theme";
+import { Routes } from "./src/routes";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Platform } from 'react-native';
+
+SplashScreen.preventAutoHideAsync();
+
+ const App = () => {
+
+  const [fontsLoaded] = useFonts({
+    Jost_300Light,
+    Jost_400Regular,
+    Jost_600SemiBold
+  })
+
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
+
+  
+
+  useEffect(() => {
+    const loadFont = async () => {
+      if (fontsLoaded) {
+        console.log('fontes carregadas');
+        await SplashScreen.hideAsync();
+      } 
+    }
+
+    loadFont()
+  }, [fontsLoaded])
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+      <GestureHandlerRootView style={{flex: 1}}>
+        <ThemeProvider theme={theme}>
+          <Routes />
+        </ThemeProvider>
+      </GestureHandlerRootView>
+  )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
